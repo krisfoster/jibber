@@ -168,7 +168,7 @@
 								<buildArg>-Ob</buildArg>
 								<buildArg>-H:+ReportExceptionStackTraces</buildArg>
 								<!-- Turn on JFR Support -->
-								<!--buildArg>-H:+AllowVMInspection</buildArg-->
+								<buildArg>-H:+AllowVMInspection</buildArg>
 								<!-- Static exe -->
 								<!--buildArg>- -static - -libc=musl</buildArg-->
 							</buildArgs>
