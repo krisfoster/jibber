@@ -1,0 +1,24 @@
+name: GraalVM Jibber Github Actions Pipeline
+on: [push, pull_request]
+jobs:
+  build:
+    name: Native Image Containerisation on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          version: '22.2.0'
+          java-version: '17'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Test Java Code
+        run: |
+          cd native-image/containerisation/lab/
+          ./mvnw --no-transfer-progress clean test
+          ./mvnw --no-transfer-progress package -Pnative
