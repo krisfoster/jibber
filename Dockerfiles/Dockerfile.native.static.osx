@@ -1,0 +1,62 @@
+FROM ghcr.io/graalvm/native-image:ol8-java17-22 AS builder
+
+ENV LIBMUSL_DOWNLOAD_URL="http://more.musl.cc/10/x86_64-linux-musl/x86_64-linux-musl-native.tgz"
+ENV LIBMUSL_FILE="x86_64-linux-musl-native.tgz"
+
+# Install tar and gzip to extract the Maven binaries
+RUN microdnf update \
+ && microdnf install --nodocs \
+    tar \
+    gzip \
+    tar \
+    wget \
+    make \
+ && microdnf clean all \
+ && rm -rf /var/cache/yum
+
+# Install libmsul
+RUN mkdir -p musl \
+  && cd musl \
+  && wget ${LIBMUSL_DOWNLOAD_URL} \
+  && tar -xzf ${LIBMUSL_FILE} \
+  && rm ${LIBMUSL_FILE} \
+  && export TOOLCHAIN_DIR=`pwd`/x86_64-linux-musl-native \
+  && export CC=${TOOLCHAIN_DIR}/bin/gcc \
+  # Download, build, install zlib into TOOLCHAIN_DIR
+  && wget https://zlib.net/zlib-1.2.12.tar.gz \
+  && tar -xzf zlib-1.2.12.tar.gz \
+  && rm zlib-1.2.12.tar.gz \
+  && cd zlib-1.2.12 \
+  && ./configure --prefix=${TOOLCHAIN_DIR} --static \
+  && make \
+  && make install \
+  && cd .. \
+  && export LIBMUSL_BIN_DIR=${TOOLCHAIN_DIR}/bin \
+  && echo "export TOOLCHAIN_DIR=${TOOLCHAIN_DIR}" >> ~/.bashrc \
+  && echo "export LIBMUSL_BIN_DIR=${TOOLCHAIN_DIR}/bin" >> ~/.bashrc \
+  && echo "export PATH=\${LIBMUSL_BIN_DIR}:\${PATH}" >> ~/.bashrc
+
+# Set the working directory to /home/app
+WORKDIR /build
+
+# Copy the source code into the image for building
+COPY . /build
+
+# Build using libmusl as the C toolchain
+RUN source ~/.bashrc \
+    && ./mvnw --no-transfer-progress -Pnative -DskipTests package
+
+# Create a /tmp dir as tomcat needs it
+RUN mkdir -p /tmp \
+    && chmod -R 775 /tmp
+
+# The deployment Image
+FROM scratch
+
+EXPOSE 8080
+
+# Copy the native executable into the containers
+COPY --from=builder /build/target/jibber /app
+# Copy in the /tmp dir, needed by the web server
+COPY --from=builder /tmp /tmp
+CMD ["/app"]

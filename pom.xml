@@ -12,12 +12,18 @@
 	<artifactId>benchmarks</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>benchmarks</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Spring Boot Native Image Benchmarks</description>
+
 	<properties>
+		<!-- JDK version -->
 		<java.version>17</java.version>
 		<repackage.classifier/>
+		<!-- Spring Boot Native Version -->
 		<spring-native.version>0.12.1</spring-native.version>
+		<!-- The name of the output binary -->
+		<binary-name>jibber</binary-name>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -32,11 +38,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		<!-- Add support for Actuator and metrics -->
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		<!-- Our Markov model library -->
 		<dependency>
 			<groupId>org.rednoise</groupId>
 			<artifactId>rita</artifactId>
@@ -64,6 +72,7 @@
 					</image>
 				</configuration>
 			</plugin>
+			<!-- Spring Native Plugin -->
 			<plugin>
 				<groupId>org.springframework.experimental</groupId>
 				<artifactId>spring-aot-maven-plugin</artifactId>
@@ -85,6 +94,8 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<!-- Required to use the Spring Native Plugins -->
 	<repositories>
 		<repository>
 			<id>spring-releases</id>
@@ -107,10 +118,12 @@
 	</pluginRepositories>
 
 	<profiles>
+		<!-- Profile to build the native binary -->
 		<profile>
 			<id>native</id>
 			<properties>
 				<repackage.classifier>exec</repackage.classifier>
+				<!-- Version of Native Build tools to use -->
 				<native-buildtools.version>0.9.13</native-buildtools.version>
 			</properties>
 			<dependencies>
@@ -120,6 +133,8 @@
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
+			<!-- GraalVM Native Image Build Plugin
+				https://github.com/graalvm/native-build-tools -->
 			<build>
 				<plugins>
 					<plugin>
@@ -128,6 +143,7 @@
 						<version>${native-buildtools.version}</version>
 						<extensions>true</extensions>
 						<executions>
+							<!-- Run the plugin in durring testing, allows for native compilation of the tests -->
 							<execution>
 								<id>test-native</id>
 								<phase>test</phase>
@@ -135,6 +151,7 @@
 									<goal>test</goal>
 								</goals>
 							</execution>
+							<!-- Run the plugin during packaging, allows for native compilation of the application -->
 							<execution>
 								<id>build-native</id>
 								<phase>package</phase>
@@ -143,6 +160,19 @@
 								</goals>
 							</execution>
 						</executions>
+						<configuration>
+							<!-- Set a custom name for the output binary file -->
+							<imageName>${binary-name}</imageName>
+							<buildArgs>
+								<!-- Quick build mode, for the impatient, or those giving talks -->
+								<buildArg>-Ob</buildArg>
+								<buildArg>-H:+ReportExceptionStackTraces</buildArg>
+								<!-- Turn on JFR Support -->
+								<!--buildArg>-H:+AllowVMInspection</buildArg-->
+								<!-- Static exe -->
+								<!--buildArg>- -static - -libc=musl</buildArg-->
+							</buildArgs>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>

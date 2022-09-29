@@ -1,0 +1,16 @@
+FROM ghcr.io/graalvm/native-image:ol8-java17-22 AS builder
+
+# Create a /tmp dir as tomcat needs it
+RUN mkdir -p /tmp \
+    && chmod -R 775 /tmp
+
+FROM scratch
+
+EXPOSE 8080
+
+# Copy the native executable into the containers
+COPY ./target/jibber /app
+# Copy in the /tmp dir, needed by the web server
+COPY --from=builder /tmp /tmp
+
+CMD ["/app"]
