@@ -52,7 +52,7 @@ runNativeContainer:
 
 # Runs the application
 runWithJFR:
-	target/jibber -XX:+FlightRecorder -XX:StartFlightRecording="filename=recording1.jfr,dumponexit=true,duration=10s" &
+	target/jibber -XX:+FlightRecorder -XX:StartFlightRecording="filename=recording1.jfr,dumponexit=true" &
 .PHONY: runWithJFR
 
 visualvm:

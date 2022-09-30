@@ -166,11 +166,14 @@
 							<buildArgs>
 								<!-- Quick build mode, for the impatient, or those giving talks -->
 								<buildArg>-Ob</buildArg>
+								<!-- Add support for exit handlers : these are not the default. You want for
+								 applications, such as this, but not for shared libs -->
+								<buildArg>--install-exit-handlers</buildArg>
 								<buildArg>-H:+ReportExceptionStackTraces</buildArg>
 								<!-- Turn on JFR Support -->
 								<buildArg>-H:+AllowVMInspection</buildArg>
 								<!-- Static exe -->
-								<!--buildArg>- -static - -libc=musl</buildArg-->
+								<!--buildArg>- -static-libc=musl</buildArg-->
 							</buildArgs>
 						</configuration>
 					</plugin>
