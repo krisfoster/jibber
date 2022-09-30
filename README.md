@@ -1,8 +1,11 @@
-# Jibber Benchmark Project
+# Jibber Benchmark
 
-![short link](bit.ly_3Rp9H94.png)
+<img src="bit.ly_3Rp9H94.png" alt="short link" width="25%"/>
 
 This project demonstrates a simple Spring Boot Application that can be used to benchmark the performance of GraalVM Native Images.
+
+The application uses a Markow Model to model the poem, The Jabberwocky, and then generate new, random poem that ressemble the original.
+Useful, I know.
 
 ## To Test
 
