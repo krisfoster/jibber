@@ -2,6 +2,13 @@
 
 <img src="bit.ly_3Rp9H94.png" alt="short link" width="25%"/>
 
+> ’Twas brillig, and the slithy toves
+> Did gyre and gimble in the wabe:
+> All mimsy were the borogoves,
+> And the mome raths outgrabe.
+> Beware the Jabberwock, my son!
+> The jaws that bite, the claws that catch!
+
 This project demonstrates a simple Spring Boot Application that can be used to benchmark the performance of GraalVM Native Images.
 
 The application uses a Markow Model to model the poem, The Jabberwocky, and then generate new, random poem that ressemble the original.
