@@ -20,6 +20,7 @@ nativeLocal:
 
 # Builds a JVM docker image of the application
 docker:
+	./mvnw package
 	docker build -f Dockerfiles/Dockerfile.jvm \
 		            --build-arg JAR_FILE=target/benchmarks-0.0.1-SNAPSHOT.jar \
 					-t jibber:jdk \
@@ -44,7 +45,7 @@ dockerNativeLinux:
 		            --build-arg APP_FILE=target/jibber \
 					-t jibber:native \
 					.
-.PHONY: dockerNative
+.PHONY: dockerNativeLinux
 
 runNativeContainer:
 	docker run --rm --name jibber-native -d -p 8080:8080 jibber:native
@@ -52,7 +53,7 @@ runNativeContainer:
 
 # Runs the application
 runWithJFR:
-	target/jibber -XX:+FlightRecorder -XX:StartFlightRecording="filename=recording1.jfr,dumponexit=true" &
+	./jibber -XX:+FlightRecorder -XX:StartFlightRecording="filename=recording1.jfr,dumponexit=true" &
 .PHONY: runWithJFR
 
 visualvm:
@@ -60,7 +61,7 @@ visualvm:
 .PHONY: visualvm
 
 dockerNativeStaticOSX:
-	docker build --file Dockerfiles/Dockerfile.native.static.osx --tag jibber:static .
+	docker build --file Dockerfiles/Dockerfile.native.static.osx -t jibber:static .
 .PHONY: dockerNativeStaticOSX
 
 runNativeStaticContaner:
