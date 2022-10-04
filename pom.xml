@@ -172,8 +172,68 @@
 								<buildArg>-H:+ReportExceptionStackTraces</buildArg>
 								<!-- Turn on JFR Support -->
 								<buildArg>-H:+AllowVMInspection</buildArg>
+							</buildArgs>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<!-- Profile to build the native binary -->
+		<profile>
+			<id>static</id>
+			<properties>
+				<repackage.classifier>exec</repackage.classifier>
+				<!-- Version of Native Build tools to use -->
+				<native-buildtools.version>0.9.13</native-buildtools.version>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.junit.platform</groupId>
+					<artifactId>junit-platform-launcher</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<!-- GraalVM Native Image Build Plugin
+				https://github.com/graalvm/native-build-tools -->
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.graalvm.buildtools</groupId>
+						<artifactId>native-maven-plugin</artifactId>
+						<version>${native-buildtools.version}</version>
+						<extensions>true</extensions>
+						<executions>
+							<!-- Run the plugin in durring testing, allows for native compilation of the tests -->
+							<execution>
+								<id>test-native</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+							</execution>
+							<!-- Run the plugin during packaging, allows for native compilation of the application -->
+							<execution>
+								<id>build-native</id>
+								<phase>package</phase>
+								<goals>
+									<goal>build</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<!-- Set a custom name for the output binary file -->
+							<imageName>${binary-name}</imageName>
+							<buildArgs>
+								<!-- Quick build mode, for the impatient, or those giving talks -->
+								<buildArg>-Ob</buildArg>
+								<!-- Add support for exit handlers : these are not the default. You want for
+								 applications, such as this, but not for shared libs -->
+								<buildArg>--install-exit-handlers</buildArg>
+								<buildArg>-H:+ReportExceptionStackTraces</buildArg>
+								<!-- Turn on JFR Support -->
+								<buildArg>-H:+AllowVMInspection</buildArg>
 								<!-- Static exe -->
-								<!--buildArg>- -static-libc=musl</buildArg-->
+								<buildArg>--static --libc=musl </buildArg>
 							</buildArgs>
 						</configuration>
 					</plugin>

@@ -43,8 +43,10 @@ WORKDIR /build
 COPY . /build
 
 # Build using libmusl as the C toolchain
+# NOTE : Using a separate profile for the tatic build that has the libmusl toolchain turned on as the c toolchain
 RUN source ~/.bashrc \
-    && ./mvnw --no-transfer-progress -Pnative -DskipTests package
+    && echo ${PATH} \
+    && ./mvnw --no-transfer-progress -Pstatic -DskipTests package
 
 # Create a /tmp dir as tomcat needs it
 RUN mkdir -p /tmp \
