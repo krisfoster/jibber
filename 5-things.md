@@ -12,7 +12,7 @@ Generate nonsense verse with a Spring Boot App
 
 ---
 
-## 1 : Use GraalVM
+## 1 : Use GraalVM & the GraalVM Native Build Tools
 
 Install GraalVM [https://github.com/graalvm/graalvm-jdk-downloader/tree/dev](https://github.com/graalvm/graalvm-jdk-downloader/tree/dev):
 

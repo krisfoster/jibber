@@ -14,6 +14,6 @@ public class BenchmarkApplicationTest {
 
 	@Test
 	public void contextLoads() throws Exception {
-		assertThat(controller).isNotNull();
+			assertThat(controller).isNotNull();
 	}
 }

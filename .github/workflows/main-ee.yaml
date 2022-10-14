@@ -6,7 +6,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v2
 
@@ -21,4 +21,49 @@ jobs:
       - name: Build and Test Java Code
         run: |
           ./mvnw --no-transfer-progress clean test
-          ./mvnw --no-transfer-progress -Pnative package
+          ./mvnw --no-transfer-progress -Pnative package 
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: |
+            target/jibber
+            Dockerfiles/Dockerfile.native
+          retention-days: 1
+
+  push_container:
+    name: Push Container to OCIR
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    env:
+      OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
+      OCI_CLI_TENANCY: ${{ secrets.OCI_TENANCY_OCID }}
+      OCI_CLI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_KEY_FILE }}
+      OCI_CLI_REGION: ${{ secrets.OCI_REGION }}
+  steps:
+    - name: Get or create an OCIR Repository
+      uses: oracle-actions/get-ocir-repository@v1.1
+      id: get-ocir-repository
+      with:
+        name: oraclelinux
+        compartment: ${{ secrets.OCI_COMPARTMENT_OCID }}
+
+    - name: Log into OCIR
+      uses: oracle-actions/login-ocir@v1.1
+      id: login-ocir
+      with:
+        auth_token: ${{ secrets.OCI_AUTH_TOKEN }}
+
+    - name: Download a single artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: dist
+
+    - name: Tag and push a container image
+      id: tag-and-push-image
+      run: |
+        docker pull oraclelinux:8-slim
+        docker build -t ${{ steps.get-ocir-repository.outputs.repository }}/jibber:native.latest -f Dockerfiles/Dockerfile.native .
+        docker push "${{ steps.get-ocir-repository.outputs.repo_path }}/jibber:native.latest"
