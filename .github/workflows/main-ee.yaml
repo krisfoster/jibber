@@ -72,5 +72,5 @@ jobs:
           echo ${{ steps.get-ocir-repository.outputs.repository }}
           echo ${{ steps.get-ocir-repository.outputs.repo_path }}
           docker pull oraclelinux:8-slim
-          docker build -t ${{ steps.get-ocir-repository.outputs.repository }}/demo:jibber.native.latest -f Dockerfiles/Dockerfile.native .
-          docker push "${{ steps.get-ocir-repository.outputs.repo_path }}/demo:jibber.native.latest"
+          docker build -t ${{ steps.get-ocir-repository.outputs.repo_path }}/demo:jibber_new.native.latest -f Dockerfiles/Dockerfile.native .
+          docker push "${{ steps.get-ocir-repository.outputs.repo_path }}/demo:jibber_new.native.latest"
