@@ -65,11 +65,18 @@ jobs:
       - name: Tag and push a container image
         id: tag-and-push-image
         run: |
-          echo ${{ steps.get-ocir-repository.outputs.repository }}
-          echo ${{ steps.get-ocir-repository.outputs.repo_path }}
+          echo "${{ steps.get-ocir-repository.outputs.repo_path }}:jibber_new.native.latest" > repo_path.txt
           docker pull oraclelinux:8-slim
           docker build -t ${{ steps.get-ocir-repository.outputs.repo_path }}:jibber_new.native.latest -f Dockerfiles/Dockerfile.native .
           docker push "${{ steps.get-ocir-repository.outputs.repo_path }}:jibber_new.native.latest"
+
+      - name: Archive repo path
+        uses: actions/upload-artifact@v3
+        with:
+          name: repo_path
+          path: |
+            repo_path.txt
+          retention-days: 1
 
   install-kubectl:
     runs-on: ubuntu-latest
@@ -84,6 +91,13 @@ jobs:
       OCI_CLI_REGION: ${{ secrets.OCI_REGION }}
 
     steps:
+      - uses: actions/checkout@v2
+
+      - name: Download a single artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: repo_path
+
       - name: Configure Kubectl
         uses: oracle-actions/configure-kubectl-oke@v1.1
         id: test-configure-kubectl-oke-action
@@ -92,3 +106,10 @@ jobs:
 
       - name: Run Kubectl
         run: kubectl get nodes -A
+
+      - name: Apply k8s config
+        run: |
+          ls -la
+          cat repo_path.txt
+          kubectl apply -f k8s/namespace.yaml
+          IMG=`cat repo_path.txt` && envsubst < k8s/deployment.yaml | kubectl apply -f -

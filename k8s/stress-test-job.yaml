@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: stress-test-native-new-job
+  namespace: jibber-new
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: stress-test-native
+            image: williamyeh/hey:latest
+            imagePullPolicy: IfNotPresent
+            command:
+            - /hey
+            - -z
+            - 1m
+            - http://jibber-new-native-svc.jibber.svc.cluster.local:8080/jibber
+          restartPolicy: Never
+---
+

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jibber-new-native-deployment
+  namespace: jibber-new
+  labels:
+    app: jibber-new-native
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jibber-new-native
+  template:
+    metadata:
+      labels:
+        app: jibber-new-native
+    spec:
+      containers:
+        - name: jibber-new-native
+          image: ${IMG}
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "2000m"
+            limits:
+              memory: "256Mi"
+              cpu: "2000m"
+          ports:
+            - containerPort: 8080
+              name: native-port
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jibber-new-native-svc
+  namespace: jibber-new
+  labels:
+    app: jibber-new-native
+  annotations:
+    oci.oraclecloud.com/load-balancer-type: "lb"
+    service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "100"
+    prometheus.io/path: "/actuator/prometheus"
+    prometheus.io/port: "8080"
+    prometheus.io/scrape: "true"
+spec:
+  type: LoadBalancer
+  ports:
+    - port : 8080
+  selector:
+    app: jibber-new-native
+
+---
