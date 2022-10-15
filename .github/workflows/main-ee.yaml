@@ -52,7 +52,7 @@ jobs:
         uses: oracle-actions/get-ocir-repository@v1.1
         id: get-ocir-repository
         with:
-          name: oraclelinux
+          name: demo
           compartment: ${{ secrets.OCI_COMPARTMENT_OCID }}
 
       - name: Log into OCIR
@@ -69,6 +69,8 @@ jobs:
       - name: Tag and push a container image
         id: tag-and-push-image
         run: |
+          echo ${{ steps.get-ocir-repository.outputs.repository }}
+          echo ${{ steps.get-ocir-repository.outputs.repo_path }}
           docker pull oraclelinux:8-slim
           docker build -t ${{ steps.get-ocir-repository.outputs.repository }}/demo:jibber.native.latest -f Dockerfiles/Dockerfile.native .
           docker push "${{ steps.get-ocir-repository.outputs.repo_path }}/demo:jibber.native.latest"
