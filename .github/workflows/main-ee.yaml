@@ -34,10 +34,7 @@ jobs:
   push_container:
     name: Push Container to OCIR
     needs: [build]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     env:
       OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
@@ -73,3 +70,25 @@ jobs:
           docker pull oraclelinux:8-slim
           docker build -t ${{ steps.get-ocir-repository.outputs.repo_path }}:jibber_new.native.latest -f Dockerfiles/Dockerfile.native .
           docker push "${{ steps.get-ocir-repository.outputs.repo_path }}:jibber_new.native.latest"
+
+  install-kubectl:
+    runs-on: ubuntu-latest
+    name: Install Kubectl for OKE
+    needs: [push_container]
+    if: github.ref == 'refs/heads/main'
+    env:
+      OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
+      OCI_CLI_TENANCY: ${{ secrets.OCI_TENANCY_OCID }}
+      OCI_CLI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_KEY_FILE }}
+      OCI_CLI_REGION: ${{ secrets.OCI_REGION }}
+
+    steps:
+      - name: Configure Kubectl
+        uses: oracle-actions/configure-kubectl-oke@v1.1
+        id: test-configure-kubectl-oke-action
+        with:
+          cluster: ${{ secrets.OKE_CLUSTER_OCID }}
+
+      - name: Run Kubectl
+        run: kubectl get nodes -A
