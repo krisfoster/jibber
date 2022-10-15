@@ -110,6 +110,7 @@ jobs:
       - name: Apply k8s config
         run: |
           ls -la
-          cat repo_path.txt
+          export IMG=`cat repo_path.txt`
+          echo $IMG
           kubectl apply -f k8s/namespace.yaml
           IMG=`cat repo_path.txt` && envsubst < k8s/deployment.yaml | kubectl apply -f -
