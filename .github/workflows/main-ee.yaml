@@ -20,8 +20,7 @@ jobs:
 
       - name: Build and Test Java Code
         run: |
-          ./mvnw --no-transfer-progress clean test
-          ./mvnw --no-transfer-progress -Pnative package 
+          ./mvnw --no-transfer-progress -Pnative -DskipNativeTests package 
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
