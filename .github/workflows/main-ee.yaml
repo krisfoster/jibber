@@ -35,6 +35,10 @@ jobs:
   push_container:
     name: Push Container to OCIR
     needs: [build]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
     if: github.ref == 'refs/heads/main'
     env:
       OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
