@@ -3,10 +3,7 @@ on: [push, pull_request]
 jobs:
   build:
     name: GraalVM Jibber on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
@@ -20,13 +17,15 @@ jobs:
 
       - name: Build and Test Java Code
         run: |
-          ./mvnw --no-transfer-progress -Pnative -DskipNativeTests package 
+          ./mvnw --no-transfer-progress -Pnative -DskipNativeTests package
+          ./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout > version.txt
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         with:
           name: dist
           path: |
+            version.txt
             target/jibber
             Dockerfiles/Dockerfile.native
           retention-days: 1
@@ -65,10 +64,15 @@ jobs:
       - name: Tag and push a container image
         id: tag-and-push-image
         run: |
-          echo "${{ steps.get-ocir-repository.outputs.repo_path }}:jibber_new.native.latest" > repo_path.txt
+          export VER=`cat version.txt`
+          echo ${VER}
+          #echo "${{ steps.get-ocir-repository.outputs.repo_path }}:jibber_new.native.latest" > repo_path.txt
+          export REPO="${{ steps.get-ocir-repository.outputs.repo_path }}:jibber_new.native.${VER}"
+          echo ${REPO}
+          echo ${REPO} > repo_path.txt
           docker pull oraclelinux:8-slim
-          docker build -t ${{ steps.get-ocir-repository.outputs.repo_path }}:jibber_new.native.latest -f Dockerfiles/Dockerfile.native .
-          docker push "${{ steps.get-ocir-repository.outputs.repo_path }}:jibber_new.native.latest"
+          docker build -t ${REPO} -f Dockerfiles/Dockerfile.native --build-arg APP_FILE=target/jibber .
+          docker push "${REPO}"
 
       - name: Archive repo path
         uses: actions/upload-artifact@v3
@@ -111,6 +115,5 @@ jobs:
         run: |
           ls -la
           export IMG=`cat repo_path.txt`
-          echo $IMG
           kubectl apply -f k8s/namespace.yaml
           IMG=`cat repo_path.txt` && envsubst < k8s/deployment.yaml | kubectl apply -f -

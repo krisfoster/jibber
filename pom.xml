@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.oracle.graalvm</groupId>
 	<artifactId>benchmarks</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>benchmarks</name>
 	<description>Spring Boot Native Image Benchmarks</description>
 
