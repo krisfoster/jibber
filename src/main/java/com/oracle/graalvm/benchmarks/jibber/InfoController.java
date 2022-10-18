@@ -21,7 +21,7 @@ public class InfoController {
 
     @RequestMapping
     ResponseEntity<String> jibber() {
-        return ResponseEntity.ok("Version : 1.0");
+        return ResponseEntity.ok("Version : 1.1");
     }
 }
 
