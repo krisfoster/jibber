@@ -25,6 +25,7 @@ public class JibberController {
     @Label("JibberwockyEvent")
     @Description("Used for recording events in our Jaberwocky Controller")
     static class JabberwockydEvent extends Event {
+        // Message.
         @Label("Message")
         String message;
     }
