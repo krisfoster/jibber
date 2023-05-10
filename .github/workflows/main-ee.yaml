@@ -67,7 +67,7 @@ jobs:
           export VER=`cat version.txt`
           echo ${VER}
           #echo "${{ steps.get-ocir-repository.outputs.repo_path }}:jibber_new.native.latest" > repo_path.txt
-          export REPO="${{ steps.get-ocir-repository.outputs.repo_path }}:jibber_new.native.${VER}"
+          export REPO="${{ steps.get-ocir-repository.outputs.repo_path }}:jibber_new.native.${VER}.NEW"
           echo ${REPO}
           echo ${REPO} > repo_path.txt
           docker pull oraclelinux:8-slim
