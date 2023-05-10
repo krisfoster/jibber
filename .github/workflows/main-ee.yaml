@@ -5,7 +5,7 @@ jobs:
     name: GraalVM Jibber on ${{ matrix.os }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: graalvm/setup-graalvm@v1
         with:
@@ -95,7 +95,7 @@ jobs:
       OCI_CLI_REGION: ${{ secrets.OCI_REGION }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Download a single artifact
         uses: actions/download-artifact@v3
