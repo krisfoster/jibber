@@ -11,7 +11,7 @@
 
 This project demonstrates a simple Spring Boot Application that can be used to benchmark the performance of GraalVM Native Images.
 
-The application uses a Markow Model to model the poem, The Jabberwocky, and then generate new, random poem that ressemble the original.
+The application uses a Markow Model to model the poem, The Jabberwocky, and then generate a new, random poem that ressembles the original.
 Useful, I know.
 
 ## To Test
@@ -22,11 +22,13 @@ Useful, I know.
 
 ## To Build
 
+To generate the Java application and run it:
 ```shell
 ./mvnw package
 java -jar target/benchmarks-0.0.1-SNAPSHOT-exec.jar &
 curl http://localhost:8080/jibber
 ```
+
 
 ## To Run the Tests Natively
 
@@ -41,6 +43,8 @@ curl http://localhost:8080/jibber
 target/jibber &
 curl http://localhost:8080/jibber
 ```
+
+## To Deploy to K8s
 
 
 
